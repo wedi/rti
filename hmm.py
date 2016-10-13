@@ -16,14 +16,18 @@
 #     Observations can take any values, but the possible values must be
 #     listed in "V".
 #
-# See: 
+# See:
 
 import sys
+
 import numpy as np
 
 
-class nealsHMM:
+class None(object):
+    pass
 
+
+class nealsHMM:
     # HMM Settings (from Rabiner 1989 tutorial)
     # A: Probability of transition in one step.  Matrix with A[i,j] as the
     #    one-step prob of transition from i to j.
@@ -50,7 +54,7 @@ class nealsHMM:
         self.phi = []
         self.qstar = []
         self.states = A.shape[0]
-    
+
     # Append new observations in newdata list to the data list.
     def observe(self, newdata):
         for i in newdata:
@@ -65,32 +69,32 @@ class nealsHMM:
     def forward(self):
         k = len(self.alpha)
         T = len(self.data)
-        if k==0 and k<T:
-            temp = self.B[:,self.data[0]] * self.pi
-            self.alpha.append(temp/sum(temp))
+        if k == 0 and k < T:
+            temp = self.B[:, self.data[0]] * self.pi
+            self.alpha.append(temp / sum(temp))
             k += 1
-        
-        for t in range(k,T):
-            temp = self.B[:,self.data[t]] * np.dot(self.alpha[-1], self.A)
-            self.alpha.append(temp/sum(temp))
+
+        for t in range(k, T):
+            temp = self.B[:, self.data[t]] * np.dot(self.alpha[-1], self.A)
+            self.alpha.append(temp / sum(temp))
 
         return self.alpha
 
     # Solve the backward algorithm to find beta.  Do for entire data, unless
     # "steps" is specified.
     def backward(self, steps=None):
-        T  = len(self.data)
-        if steps==None:
+        T = len(self.data)
+        if steps is None:
             steps = T
         if steps > T:
             sys.exit("Error: backward(steps) being called with steps > number of data points")
         self.beta = [[] for i in range(T)]
         if T > 0:
-            self.beta[-1] = [1]*self.states
+            self.beta[-1] = [1] * self.states
 
-        for t in range(T-2,-1,-1):
-            temp = np.dot(self.A, self.B[:,self.data[t+1]] * self.beta[t+1])
-            self.beta[t] = (temp/sum(temp))
+        for t in range(T - 2, -1, -1):
+            temp = np.dot(self.A, self.B[:, self.data[t + 1]] * self.beta[t + 1])
+            self.beta[t] = (temp / sum(temp))
 
         return self.beta
 
@@ -98,7 +102,7 @@ class nealsHMM:
     #   Specifically, steps==1 is the current time, steps==2 is one time step ago.
     def forwardBackward(self, steps=None):
         self.forward()
-        if steps==None:
+        if steps is None:
             steps = len(self.data)
         self.backward(steps)
         temp = self.beta[-steps] * self.alpha[-steps]
@@ -116,38 +120,35 @@ class nealsHMM:
     def viterbi(self, steps=None):
         T = len(self.data)
         k = len(self.delta)
-        self.qstar = [-1]*T # for i in range(T)]
-        if steps == None:
+        self.qstar = [-1] * T  # for i in range(T)]
+        if steps is None:
             steps = T
         if steps > T:
             sys.exit("Error: viterbi(steps) being called with steps > number of data points")
-        
-        
+
         # Equations 32a and 32b in Rabiner "Initialization"
-        if k==0 and k<T:
-            self.delta.append( self.B[:,self.data[0]] * self.pi )
-            self.phi.append( [0]*self.states )
+        if k == 0 and k < T:
+            self.delta.append(self.B[:, self.data[0]] * self.pi)
+            self.phi.append([0] * self.states)
             k += 1
-        
+
         # Equations 33a and 33b in Rabiner "Recursion"
-        for t in range(k,T):
-            tempdelta    = [0.0]*self.states
-            tempphi      = [0]*self.states
+        for t in range(k, T):
+            tempdelta = [0.0] * self.states
+            tempphi = [0] * self.states
             for j, a_all_j in enumerate(self.A.T):
-                prod_a_d     = a_all_j * self.delta[t-1]
-                tempdelta[j] = prod_a_d.max() * self.B[j,self.data[t]]
-                tempphi[j]   = prod_a_d.argmax()
-            self.delta.append( tempdelta / sum(tempdelta) )
-            self.phi.append( tempphi )
+                prod_a_d = a_all_j * self.delta[t - 1]
+                tempdelta[j] = prod_a_d.max() * self.B[j, self.data[t]]
+                tempphi[j] = prod_a_d.argmax()
+            self.delta.append(tempdelta / sum(tempdelta))
+            self.phi.append(tempphi)
 
         # Equations 34a and 34b in Rabiner "Termination"
         # Pstar      = max(self.delta[-1])
         self.qstar[-1] = self.delta[-1].argmax()
-        
+
         # Equation 35 in Rabiner "Path backtracking"
-        for t in range(T-2,T-steps-1,-1):
-            self.qstar[t] = self.phi[t+1][self.qstar[t+1]]
+        for t in range(T - 2, T - steps - 1, -1):
+            self.qstar[t] = self.phi[t + 1][self.qstar[t + 1]]
 
         return self.qstar
-
-

@@ -33,36 +33,35 @@
 # Version 0.2:  4 July 2016: outputs time in ms as an integer rather than a float.
 
 
-import sys
-import rss 
 import getopt
+import sys
 
+import rss
 
 # If you want beeps and/or second printing, set to True
-soundOption     = False
-printOption     = False
+soundOption = False
+printOption = False
 notMeasuredCode = 127
-numNodes        = 10
-numChs          = 8    # Changed with new Xandem kits from 4 to 8
-beepRate        = 1.0  # Beeps per second
-startSkip       = 24
-channelCol      = 2
-rxidCol         = 4
-timeCol         = -1  # last column
+numNodes = 10
+numChs = 8  # Changed with new Xandem kits from 4 to 8
+beepRate = 1.0  # Beeps per second
+startSkip = 24
+channelCol = 2
+rxidCol = 4
+timeCol = -1  # last column
 # First column containing RSS values.  Changed with new Xandem kits from 11 to 7.
 firstRSSValueCol = 7
 
-
 # Get the file name and any other options from the command line
 file_method = "stdin"
-fin         = sys.stdin
+fin = sys.stdin
 # Accept command line inputs for file input
-myopts, args = getopt.getopt(sys.argv[1:],"i:")
+myopts, args = getopt.getopt(sys.argv[1:], "i:")
 for o, a in myopts:
     if o == "-i":
         file_method = "file"
-        fname =  a
-        fin = open(a,'r')
+        fname = a
+        fin = open(a, 'r')
     else:
         sys.stderr.write("Usage: %s -i filename.txt" % sys.argv[0])
 
@@ -70,31 +69,31 @@ if printOption:
     print fin
 
 # Constants calculated from the inputs
-nodeList        = range(1, numNodes+1)   # Xandem nodes are 1...10
-numLinks        = numNodes*(numNodes-1)*numChs
-channelList     = range(numChs)
-numLines        = numNodes*numChs
+nodeList = range(1, numNodes + 1)  # Xandem nodes are 1...10
+numLinks = numNodes * (numNodes - 1) * numChs
+channelList = range(numChs)
+numLines = numNodes * numChs
 
 # remove junk from start of file.
-for i in range(startSkip): 
-    line        = fin.readline()
+for i in range(startSkip):
+    line = fin.readline()
 
 # Use the first line to determine the starting time
-lineStrings     = line.split(', ')
-time_start      = float(lineStrings[timeCol])
+lineStrings = line.split(', ')
+time_start = float(lineStrings[timeCol])
 
 # Run forever, adding lines from input as they are available.
-lineCounter     = 0
-beepCounter     = 0
-currentLinkRSS  = [127] * numLinks
+lineCounter = 0
+beepCounter = 0
+currentLinkRSS = [127] * numLinks
 while 1:
     #  RSS is in columns 11 through 20
-    rss_now          = [int(x) for x in lineStrings[firstRSSValueCol:(firstRSSValueCol+numNodes)]]
-    ch_now           = int(lineStrings[channelCol])
-    rxid_now         = int(lineStrings[rxidCol])
-    time_now         = float(lineStrings[-1])
-    time_diff        = time_now - time_start
-    time_diff_ms     = int(1000.0*time_diff)
+    rss_now = [int(x) for x in lineStrings[firstRSSValueCol:(firstRSSValueCol + numNodes)]]
+    ch_now = int(lineStrings[channelCol])
+    rxid_now = int(lineStrings[rxidCol])
+    time_now = float(lineStrings[-1])
+    time_diff = time_now - time_start
+    time_diff_ms = int(1000.0 * time_diff)
     if printOption:
         print "rss_now: " + str(rss_now)
         print "ch_now: " + str(ch_now)
@@ -104,26 +103,26 @@ while 1:
     # If this row is the first row of a new set of RSS data, 
     # then output the old rss data, init a new one 
     # (and enter the new data into the new rss array)
-    if (lineCounter == numLines):
-        sys.stdout.write(' '.join(map(str,currentLinkRSS)) + ' ' + str(time_diff_ms) + '\n')
+    if lineCounter == numLines:
+        sys.stdout.write(' '.join(map(str, currentLinkRSS)) + ' ' + str(time_diff_ms) + '\n')
         sys.stdout.flush()
         # Restart with a new line by resetting currentLinkRSS
-        currentLinkRSS   = [127] * numLinks
-        lineCounter      = 0
+        currentLinkRSS = [127] * numLinks
+        lineCounter = 0
 
     # Beeping every beepRate
     if soundOption:
-        beepCounter  = rss.beeping(time_diff, beepRate, beepCounter, printOption)
+        beepCounter = rss.beeping(time_diff, beepRate, beepCounter, printOption)
 
     # Add each RSS to the currentLinkRSS, at the index for the linkId
-    for i,rssa in enumerate(rss_now):
-        txid         = i+1
+    for i, rssa in enumerate(rss_now):
+        txid = i + 1
         # Link between tx=i to rx=i does not exist
-        if txid != rxid_now:   
-            linkId   = rss.linkNumForTxRxChLists(txid, rxid_now, ch_now, nodeList, channelList)
+        if txid != rxid_now:
+            linkId = rss.linkNumForTxRxChLists(txid, rxid_now, ch_now, nodeList, channelList)
             currentLinkRSS[linkId] = rssa
             if printOption:
-                print "txid="+str(txid)+", link="+str(linkId)+", rss="+str(rssa)
+                print "txid=" + str(txid) + ", link=" + str(linkId) + ", rss=" + str(rssa)
 
     # Read a new line, quit if at end of file, or wait for more from stdin
     line = fin.readline()
@@ -131,14 +130,12 @@ while 1:
         break
     if (not line) & (file_method == "stdin"):
         continue
-    while line[-1] != '\n':   # If line is incomplete, add to it.
-        line        += fin.readline()
+    while line[-1] != '\n':  # If line is incomplete, add to it.
+        line += fin.readline()
         if (not line) & (file_method == "file"):
             break
 
     # Split the line at each comma
-    lineStrings      = line.split(', ')
+    lineStrings = line.split(', ')
     # Increment the line counter
-    lineCounter     += 1
-
-
+    lineCounter += 1

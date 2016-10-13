@@ -45,21 +45,25 @@
 #     measured.  Compare histograms when using with multiple files,
 #     in separate histograms stacked on top of each other.
 
+import ast
+import getopt
 import sys
-import numpy as np
+
 import matplotlib.pyplot as plt
-import getopt, ast
+import numpy as np
+
 import rss
+
 
 # Accept command line inputs to list the links to plot
 linkCombosToPlot = []
-fileList         = []
-numNodes         = 10   # Xandem kits come with 10 nodes
-numChs           = 8    # Xandem kits come programmed with 8 channels
-myopts, args = getopt.getopt(sys.argv[1:],"l:n:f:c:")
+fileList = []
+numNodes = 10  # Xandem kits come with 10 nodes
+numChs = 8  # Xandem kits come programmed with 8 channels
+myopts, args = getopt.getopt(sys.argv[1:], "l:n:f:c:")
 for o, a in myopts:
     if o == "-l":
-        inputList = ast.literal_eval( a )
+        inputList = ast.literal_eval(a)
         linkCombosToPlot.append(inputList)
     elif o == "-n":
         numNodes = int(a)
@@ -68,38 +72,38 @@ for o, a in myopts:
     elif o == "-f":
         fileList.append(a)
 
-files       = len(fileList)
-streams     = len(linkCombosToPlot)
+files = len(fileList)
+streams = len(linkCombosToPlot)
 if files == 0:
     sys.exit('Usage: histColumns.py -f file1.txt -f file2.txt ... -l "[1,2,3]" ...')
 
-print "Plotting each file in a subplot from top to bottom:" 
+print "Plotting each file in a subplot from top to bottom:"
 print fileList
 print "Plotting links:"
 print linkCombosToPlot
 
 # Convert the [tx,rx,ch] combos into column numbers
 linkNumList = []
-nodeList = range(1,numNodes+1)
+nodeList = range(1, numNodes + 1)
 channelList = range(numChs)
 for l in linkCombosToPlot:
-    linkNumList.append( rss.linkNumForTxRxChLists(l[0], l[1], l[2], nodeList, channelList) )
+    linkNumList.append(rss.linkNumForTxRxChLists(l[0], l[1], l[2], nodeList, channelList))
 links = len(linkNumList)
 
 # Inputs / Settings
-startSkip   = 0
-markerlist  = ['-o', '-s', '-v', '-*', '-8','-p','-+','-x']
-xbincenters = range(-110, -10)   # lowest to highest POSSIBLE rss
+startSkip = 0
+markerlist = ['-o', '-s', '-v', '-*', '-8', '-p', '-+', '-x']
+xbincenters = range(-110, -10)  # lowest to highest POSSIBLE rss
 
 # Create the bin edges.
-xbinedges   = [x - 0.5 for x in xbincenters]
+xbinedges = [x - 0.5 for x in xbincenters]
 xbinedges.append(xbincenters[-1] + 0.5)
 
 # Init the plot.
 plt.ion()
 plt.cla()
-junk        = plt.figure()
-fig         = plt.figure()
+junk = plt.figure()
+fig = plt.figure()
 
 # Keep track of min and max of data.  Initialize by giving
 # absurdly low max value and absurdly high min value.
@@ -108,46 +112,47 @@ maxrss = -110
 
 # Load data from each file.
 for i, file in enumerate(fileList):
-    data       = np.loadtxt(file, dtype=float, delimiter=' ', skiprows=startSkip)
-    cols       = data.shape[1]
-    
+    data = np.loadtxt(file, dtype=float, delimiter=' ', skiprows=startSkip)
+    cols = data.shape[1]
+
     # Remove 127 values from, and plot a histogram, for each column
-    good_data  = [ data[data[:,k] < 127, k] for k in linkNumList]
-    
+    good_data = [data[data[:, k] < 127, k] for k in linkNumList]
+
     # Print error message if a link has NO good data
     for j in range(links):
-       if good_data[j] == []: 
-           sys.exit("Error: Link " + str(linkCombosToPlot[j]) + " in file " + file + " has no non-127 values.")
-    
+        if not good_data[j]:
+            sys.exit("Error: Link " + str(
+                linkCombosToPlot[j]) + " in file " + file + " has no non-127 values.")
+
     # Update the min and max
     maxrss = max(maxrss, max([gd.max() for gd in good_data]))
     minrss = min(minrss, min([gd.min() for gd in good_data]))
-    
+
     # I don't want the histogram "bars", just the count.
     # So I'm calling hist() for a plot I don't want to look at.
-    axjunk     = junk.add_subplot(files, 1, i+1)
-    axfig      = fig.add_subplot(files, 1, i+1)
+    axjunk = junk.add_subplot(files, 1, i + 1)
+    axfig = fig.add_subplot(files, 1, i + 1)
     n, bins, patches = axjunk.hist(good_data, histtype='bar', bins=xbinedges)
-    
+
     # Plot the probability mass function for each channel's
     # (good) data, normalized so the pmf sums to one.
-    if links>1:
+    if links > 1:
         for j, count in enumerate(n):
             # This commented line caused errors in past versions of matplotlib
             # because "count" was integers and so integer division would give zero.
             # axfig.plot(xbincenters, count/sum(count), markerlist[j])
             total = float(count.sum())
-            axfig.plot(xbincenters, count/total, markerlist[j])
+            axfig.plot(xbincenters, count / total, markerlist[j])
     # if one link, the n variable is only a single list, not a list of lists,
     # so you can't use enumerate(n) and get the same result.
     else:
         total = float(n.sum())
-        axfig.plot(xbincenters, n/total, markerlist[0])        
+        axfig.plot(xbincenters, n / total, markerlist[0])
 
-# Additional formatting done on each subplot
+    # Additional formatting done on each subplot
 for i in range(files):
-    ax = plt.subplot(files, 1, i+1)
-    ax.set_xlim([minrss-1, maxrss+1])
+    ax = plt.subplot(files, 1, i + 1)
+    ax.set_xlim([minrss - 1, maxrss + 1])
     ax.set_ylabel('Probability Mass')
     ax.grid()
 ax = plt.subplot(files, 1, 1)
