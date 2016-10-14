@@ -179,12 +179,12 @@ sumRSS = np.zeros(numLinks)
 countCalLines = np.zeros(numLinks)
 keepReading = True
 while keepReading:
-    print "Counter = " + str(counter)
     line = infile.readline()
     # If at the "end of file", keep reading if reading from stdin.
     if not line:
         keepReading = fromStdin
         continue
+    print "Counter = " + str(counter)
     while line[-1] != '\n':  # If line is incomplete, add to it.
         line += infile.readline()
 
