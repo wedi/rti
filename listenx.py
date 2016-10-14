@@ -43,14 +43,14 @@ soundOption = False
 printOption = False
 notMeasuredCode = 127
 numNodes = 10
-numChs = 8  # Changed with new Xandem kits from 4 to 8
+numChs = 4  # Changed with new Xandem kits from 4 to 8
 beepRate = 1.0  # Beeps per second
-startSkip = 24
-channelCol = 2
-rxidCol = 4
+startSkip = 25
+channelCol = 6
+rxidCol = 7
 timeCol = -1  # last column
 # First column containing RSS values.  Changed with new Xandem kits from 11 to 7.
-firstRSSValueCol = 7
+firstRSSValueCol = 11
 
 # Get the file name and any other options from the command line
 file_method = "stdin"
