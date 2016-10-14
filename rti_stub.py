@@ -284,6 +284,8 @@ while keepReading:
                 RTI_err = np.sqrt(np.sum((actualCoord - RTIMaxCoord) ** 2))
                 RTI_err_list.append(RTI_err)
 
+        plt.pause(0.05)
+
     # Save RSS in case next line has missing data.
     prevRSS = rss.copy()
     counter += 1
