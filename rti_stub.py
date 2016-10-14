@@ -91,6 +91,7 @@ matplotlib.rc('ytick', labelsize=16)
 #   startSkip: A serial port seems to have a "memory" of several lines, 
 #              which were saved from the previous experiment run.  
 #              ** Must be greater than 0.
+#   calLines:  Length of calibration period
 plotSkip = 2
 startSkip = 1
 buffL = 4
