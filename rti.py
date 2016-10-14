@@ -167,7 +167,10 @@ def plotImage(image, figNumber, sensorCoords, imageExtent, vmaxval, units, time_
         if len(actualCoord) > 0:
             plt.text(actualCoord[0], actualCoord[1], 'X', horizontalalignment='center',
                      verticalalignment='center')
-    plt.draw()
+
+    # The TKAgg backend needs `draw` to be called on the canvas.
+    # plt.draw()
+    plt.get_current_fig_manager().canvas.draw()
 
 
 #  Do initial calculations to compute the RTI projection matrix
