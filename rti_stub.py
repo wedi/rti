@@ -8,15 +8,15 @@
 #    it under the terms of the GNU General Public License as published by
 #    the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
-#    
+#
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
 #    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
-#    
+#
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-# 
+#
 # Author: Neal Patwari, neal.patwari@gmail.com
 #
 # Version History:
@@ -26,42 +26,42 @@
 # Version 2.1:  3 July 2016.
 #               Added actualKnown option to turn off location error calculation
 #
-# Purpose:  
+# Purpose:
 #   This script calls functions in order to calculate radio tomographic images
-#   from the following inputs: 
-#       1) the locations of radio sensors; 
-#       2) received signal strength (RSS) measurements between pairs of those 
-#          sensors, on multiple channels.  This RTI code assumes that the RSS 
-#          was recorded using listenAllLinks.py or listenx.py, which simply 
-#          lists the RSS value on every (Tx, Rx, Channel) combination.  The last 
-#          column is the time, in integer milliseconds from the start of the 
-#          data collection.  
+#   from the following inputs:
+#       1) the locations of radio sensors;
+#       2) received signal strength (RSS) measurements between pairs of those
+#          sensors, on multiple channels.  This RTI code assumes that the RSS
+#          was recorded using listenAllLinks.py or listenx.py, which simply
+#          lists the RSS value on every (Tx, Rx, Channel) combination.  The last
+#          column is the time, in integer milliseconds from the start of the
+#          data collection.
 #   The code plots the RTI estimate.  Currently, RTI methods implemented are:
 #       1) multi-channel attenuation-based (traditional) RTI.  This is the method
-#          published in MASS 2012: 
-#             O. Kaltiokallio, M. Bocca, and N. Patwari, Enhancing the accuracy 
-#          of radio tomographic imaging using channel diversity, 9th IEEE Int'l 
+#          published in MASS 2012:
+#             O. Kaltiokallio, M. Bocca, and N. Patwari, Enhancing the accuracy
+#          of radio tomographic imaging using channel diversity, 9th IEEE Int'l
 #          Conference on Mobile Ad hoc and Sensor Systems, October 8-11, 2012.
 #       2) multi-channel variance-based RTI.  This is the straightforward
-#          extension of VRTI to multiple channels. Single-channel VRTI is 
-#          described in: 
-#             J. Wilson and N. Patwari, See Through Walls: Motion Tracking Using 
-#          Variance-Based Radio Tomography Networks, IEEE Transactions on Mobile 
+#          extension of VRTI to multiple channels. Single-channel VRTI is
+#          described in:
+#             J. Wilson and N. Patwari, See Through Walls: Motion Tracking Using
+#          Variance-Based Radio Tomography Networks, IEEE Transactions on Mobile
 #          Computing, vol. 10, no. 5, pp. 612-621, May 2011.
 #   The code outputs coordinate estimates into the file, outputFileName.
 #
-# Usage: 
+# Usage:
 #   cat filename.txt | python rti_stub.py
 #   where filename.txt is the output listenAllLinks.py or listenx.py
 #
-#   Alternatively, use 
-#      python listenx.py -i filename.txt | python rti_stub_v2.py 
+#   Alternatively, use
+#      python listenx.py -i filename.txt | python rti_stub_v2.py
 #   if the filename.txt was recorded at the gateway node.
 #
 #   Alternatively, use
-#      ssh root@xandem-gateway.local "/opt/xandev/exec/gateway/bin/gateway -l" | python listenx.py | python rti_stub_v2.py 
+#      ssh root@xandem-gateway.local "/opt/xandev/exec/gateway/bin/gateway -l" | python listenx.py | python rti_stub_v2.py
 #   for a real-time operation of the script from the data collected at the Xandem gateway node.  This assumes your gateway is connected to the same local network as the computer running this script.
-#   
+#
 #   There must be two files in the directory to use actualKnown == True:
 #      pivotFileName
 #      pathFileName
@@ -69,8 +69,8 @@
 #   There must always be the true sensor coordinate file in the directory:
 #      coordFileName
 #
-#   The output coordinate estimates (one per row of the input file) 
-#   is saved to the file named in outputFileName.  A row of -99 -99 indicates 
+#   The output coordinate estimates (one per row of the input file)
+#   is saved to the file named in outputFileName.  A row of -99 -99 indicates
 #   that no person is estimated to be present in the area.
 
 
@@ -89,8 +89,8 @@ matplotlib.rc('ytick', labelsize=16)
 # Parameters you may change:
 #   plotSkip:  Refresh the plot after this many data lines are read
 #   buffL:     buffer length, ie, how much recent data to save for each link.
-#   startSkip: A serial port seems to have a "memory" of several lines, 
-#              which were saved from the previous experiment run.  
+#   startSkip: A serial port seems to have a "memory" of several lines,
+#              which were saved from the previous experiment run.
 #              ** Must be greater than 0.
 #   calLines:  Length of calibration period
 plotSkip = 2
@@ -118,7 +118,7 @@ if actualKnown:
     pivotCoords = np.loadtxt(pivotFileName)
 
     # The "path" is just a list of the number of the pivot spots, in order
-    # that the person traverses them.  The person is assumed to 
+    # that the person traverses them.  The person is assumed to
     # hit pivot spots at a constant rate.
     pathFileName = 'Exam2_9_path.txt'  # list of pivot numbers in order.
     pathInd = np.loadtxt(pathFileName)
@@ -229,7 +229,7 @@ while keepReading:
         # We assume that no person is present during the calibration period.
         fout.write("-99 -99\n")
 
-    # When the calibration period is over, calc & display RT images, and write 
+    # When the calibration period is over, calc & display RT images, and write
     # the current coordinate estimate to the output file.
     if counter >= calLines:
 
@@ -284,7 +284,9 @@ while keepReading:
                 RTI_err = np.sqrt(np.sum((actualCoord - RTIMaxCoord) ** 2))
                 RTI_err_list.append(RTI_err)
 
-        plt.pause(0.05)
+        # Pause to allow the GUI framework to redraw the screen (required for certain backends)
+        # http://stackoverflow.com/a/12826273/2898712
+        plt.pause(0.0001)
 
     # Save RSS in case next line has missing data.
     prevRSS = rss.copy()
