@@ -6,10 +6,12 @@
 # License: GPL v3
 #
 # PURPOSE:
-#   Read in a crossings estimate file, the correct crossing times, and the time stamps from the listen_output.txt  
+#   Read in a crossings estimate file, the correct crossing times, and the time
+#   stamps from the listen_output.txt
 #   and calculate its false alarm rate, detection rate, and "score".
 #
-# Usage: calcDetectorPerformance.py -c crossingsEstFile.txt -t trueCrossingsFile.txt -r listen_output.txt
+# Usage: calcDetectorPerformance.py -c crossingsEstFile.txt \
+#            -t trueCrossingsFile.txt -r listen_output.txt
 #
 # Version History:
 #
@@ -47,9 +49,9 @@ for o, a in myopts:
         stateEstFile = a
         stateEst = np.loadtxt(stateEstFile)
         rowsEstFile = len(stateEst)
-        print(
+        print((
             'crossingDetections File ' + stateEstFile + ' contains ' + str(
-                rowsEstFile) + ' records.')
+                rowsEstFile) + ' records.'))
     elif o == "-r":
         # Find the time stamps from the rss data file (the output of listenx.py)
         timeStamps = np.loadtxt(a)[:, -1]
@@ -59,16 +61,17 @@ for o, a in myopts:
     elif o == "-t":
         trueCrossings = np.loadtxt(a) * 1000.0  # convert to ms
         numTrueCrossings = len(trueCrossings)
-        print(
+        print((
             'trueCrossings File ' + a + ' contains ' + str(
-                numTrueCrossings) + ' true crossing times.')
+                numTrueCrossings) + ' true crossing times.'))
         print(trueCrossings)
 
 # Quit, if we can't determine what time each crossingDetection corresponds to,
 #   or if there are no true crossing times.
 if rowsEstFile != rowsRSSFile:
     sys.exit(
-        "There must be an identical number of rows in the crossingDetections file as in the RSS data file")
+        "There must be an identical number of rows in the crossingDetections "
+        "file as in the RSS data file")
 if numTrueCrossings == 0:
     sys.exit("There must be at least one true crossing time")
 
@@ -112,8 +115,8 @@ falseAlarmRate = (falseAlarms + 0.0) / rowsEstFile
 # Print to screen the detection and false alarm rates, and score.
 print('correctDetectionRate = {:9.7f}'.format(correctDetectionRate))
 print('falseAlarmRate = {:9.7f}'.format(falseAlarmRate))
-print('score = correctDetectionRate - falseAlarmRate = {:9.7f}'.format(
-    correctDetectionRate - falseAlarmRate))
+print(("score = correctDetectionRate - falseAlarmRate = {:9.7f}".format(
+    correctDetectionRate - falseAlarmRate)))
 
 ###########################################################
 # PLOT THE RESULTS

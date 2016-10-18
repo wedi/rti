@@ -66,12 +66,12 @@ for o, a in myopts:
         sys.stderr.write("Usage: %s -i filename.txt" % sys.argv[0])
 
 if printOption:
-    print fin
+    print(fin)
 
 # Constants calculated from the inputs
-nodeList = range(1, numNodes + 1)  # Xandem nodes are 1...10
+nodeList = list(range(1, numNodes + 1))  # Xandem nodes are 1...10
 numLinks = numNodes * (numNodes - 1) * numChs
-channelList = range(numChs)
+channelList = list(range(numChs))
 numLines = numNodes * numChs
 
 # remove junk from start of file.
@@ -95,10 +95,10 @@ while 1:
     time_diff = time_now - time_start
     time_diff_ms = int(1000.0 * time_diff)
     if printOption:
-        print "rss_now: " + str(rss_now)
-        print "ch_now: " + str(ch_now)
-        print "rxid_now: " + str(rxid_now)
-        print "time_now: " + str(time_now)
+        print("rss_now: " + str(rss_now))
+        print("ch_now: " + str(ch_now))
+        print("rxid_now: " + str(rxid_now))
+        print("time_now: " + str(time_now))
 
     # If this row is the first row of a new set of RSS data, 
     # then output the old rss data, init a new one 
@@ -122,7 +122,7 @@ while 1:
             linkId = rss.linkNumForTxRxChLists(txid, rxid_now, ch_now, nodeList, channelList)
             currentLinkRSS[linkId] = rssa
             if printOption:
-                print "txid=" + str(txid) + ", link=" + str(linkId) + ", rss=" + str(rssa)
+                print("txid=" + str(txid) + ", link=" + str(linkId) + ", rss=" + str(rssa))
 
     # Read a new line, quit if at end of file, or wait for more from stdin
     line = fin.readline()

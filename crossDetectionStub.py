@@ -63,9 +63,9 @@ if not linkCombosToPlot:
     linkCombosToPlot.append([1, 2, 0])
 links = len(linkCombosToPlot)
 
-print "Plotting columns for links:"
-print linkCombosToPlot
-print "Number of nodes:" + str(numNodes)
+print("Plotting columns for links:")
+print(linkCombosToPlot)
+print("Number of nodes:" + str(numNodes))
 
 # Parameters you may change:
 #   plotSkip:  Refresh the plot after this many data lines are read
@@ -86,8 +86,8 @@ columns = len(lineInt)
 rss_dB = [int(f) for f in lineInt[:-1]]  # take all columns except for last column
 numLinks = len(rss_dB)
 numChs = numLinks / ((numNodes - 1) * numNodes)
-nodeList = range(1, numNodes + 1)
-channelList = range(numChs)
+nodeList = list(range(1, numNodes + 1))
+channelList = list(range(numChs))
 
 # Convert the [tx,rx,ch] combos into column numbers
 linkNumList = []
@@ -102,7 +102,7 @@ for i in range(links):
 counter = 0
 keepReading = True
 while keepReading:
-    print "counter = " + str(counter)
+    print("counter = " + str(counter))
     line = infile.readline()
     # If at the "end of file", keep reading if reading from stdin.
     if not line:
@@ -123,6 +123,6 @@ while keepReading:
 
     # Calculate the variance on all monitored links
     varVec = np.array([a.var() for a in buff])
-    print varVec
+    print(varVec)
 
     counter += 1

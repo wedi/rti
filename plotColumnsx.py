@@ -62,9 +62,9 @@ if numNodes <= 1:
 if not linkCombosToPlot:
     linkCombosToPlot.append([1, 2, 0])
 
-print "Plotting columns for links:"
-print linkCombosToPlot
-print "Number of nodes:" + str(numNodes)
+print("Plotting columns for links:")
+print(linkCombosToPlot)
+print("Number of nodes:" + str(numNodes))
 
 # Parameters you may change:
 #   plotSkip:  Refresh the plot after this many data lines are read
@@ -88,8 +88,8 @@ rss_dB = [int(f) for f in lineInt[:-1]]  # take all columns except for last colu
 timeSec = lineInt[-1] / 1000.0  # Convert from ms to sec
 numLinks = len(rss_dB)
 numChs = numLinks / ((numNodes - 1) * numNodes)
-nodeList = range(1, numNodes + 1)
-channelList = range(numChs)
+nodeList = list(range(1, numNodes + 1))
+channelList = list(range(numChs))
 
 streams = len(linkCombosToPlot)
 linkNumList = []
@@ -115,7 +115,7 @@ for i, linkNum in enumerate(linkNumList):
 # Run forever, adding lines as they are available.
 counter = 0
 while 1:
-    print "counter = " + str(counter)
+    print("counter = " + str(counter))
     line = sys.stdin.readline()
     if not line:
         continue
@@ -152,12 +152,12 @@ while 1:
             mintime = min(min(relTime), mintime)  # Keep track of lowest reltime
             minv = min(min(RSSBuffer[i]), minv)  # track lowest rss value
             maxv = max(max(RSSBuffer[i]), maxv)  # track highest rss value
-            print minv, maxv
+            print(minv, maxv)
 
         # Make the minimum and max a multiple of min_range so that axes 
         # don't change as often
         minscale = rss.floor_multiple_of(min_range, minv)
         maxscale = rss.ceil_multiple_of(min_range, maxv)
-        print "[" + str(minscale) + ", " + str(maxscale) + "]"
+        print("[" + str(minscale) + ", " + str(maxscale) + "]")
         plt.axis([mintime, 0, minscale, maxscale])
         plt.draw()

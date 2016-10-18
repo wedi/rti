@@ -59,8 +59,11 @@
 #   if the filename.txt was recorded at the gateway node.
 #
 #   Alternatively, use
-#      ssh root@xandem-gateway.local "/opt/xandev/exec/gateway/bin/gateway -l" | python listenx.py | python rti_stub_v2.py
-#   for a real-time operation of the script from the data collected at the Xandem gateway node.  This assumes your gateway is connected to the same local network as the computer running this script.
+#       ssh root@xandem-gateway.local "/opt/xandev/exec/gateway/bin/gateway -l" | \
+#           python listenx.py | python rti_stub_v2.py
+#   for a real-time operation of the script from the data collected at the
+#   Xandem gateway node.  This assumes your gateway is connected to the same
+#   local network as the computer running this script.
 #
 #   There must be two files in the directory to use actualKnown == True:
 #      pivotFileName
@@ -186,7 +189,7 @@ while keepReading:
     if not line:
         keepReading = fromStdin
         continue
-    print "Counter = " + str(counter)
+    print("Counter = " + str(counter))
     while line[-1] != '\n':  # If line is incomplete, add to it.
         line += infile.readline()
 
@@ -233,7 +236,7 @@ while keepReading:
     # the current coordinate estimate to the output file.
     if counter >= calLines:
 
-        print "RSS on link 1 = " + str(rss[0])
+        print("RSS on link 1 = " + str(rss[0]))
 
         # Compute difference between calVec and current RSS measurement
         rss.shape = (channels, numPairs)
@@ -296,5 +299,5 @@ while keepReading:
 if actualKnown:
     VRTI_RMSE = np.sqrt(np.mean(np.array(VRTI_err_list) ** 2))
     RTI_RMSE = np.sqrt(np.mean(np.array(RTI_err_list) ** 2))
-    print "VRTI RMSE = " + str(VRTI_RMSE)
-    print "RTI RMSE = " + str(RTI_RMSE)
+    print("VRTI RMSE = " + str(VRTI_RMSE))
+    print("RTI RMSE = " + str(RTI_RMSE))

@@ -77,15 +77,15 @@ streams = len(linkCombosToPlot)
 if files == 0:
     sys.exit('Usage: histColumns.py -f file1.txt -f file2.txt ... -l "[1,2,3]" ...')
 
-print "Plotting each file in a subplot from top to bottom:"
-print fileList
-print "Plotting links:"
-print linkCombosToPlot
+print("Plotting each file in a subplot from top to bottom:")
+print(fileList)
+print("Plotting links:")
+print(linkCombosToPlot)
 
 # Convert the [tx,rx,ch] combos into column numbers
 linkNumList = []
-nodeList = range(1, numNodes + 1)
-channelList = range(numChs)
+nodeList = list(range(1, numNodes + 1))
+channelList = list(range(numChs))
 for l in linkCombosToPlot:
     linkNumList.append(rss.linkNumForTxRxChLists(l[0], l[1], l[2], nodeList, channelList))
 links = len(linkNumList)
@@ -93,7 +93,7 @@ links = len(linkNumList)
 # Inputs / Settings
 startSkip = 0
 markerlist = ['-o', '-s', '-v', '-*', '-8', '-p', '-+', '-x']
-xbincenters = range(-110, -10)  # lowest to highest POSSIBLE rss
+xbincenters = list(range(-110, -10))  # lowest to highest POSSIBLE rss
 
 # Create the bin edges.
 xbinedges = [x - 0.5 for x in xbincenters]
@@ -159,4 +159,4 @@ ax = plt.subplot(files, 1, 1)
 ax.set_xlabel('RSS Value (dBm)')
 
 # Wait for user to hit enter so that the plot doesn't disappear immediately
-raw_input("Hit enter to end.")
+input("Hit enter to end.")
