@@ -71,6 +71,9 @@ def txRxChForLinkNum(linknum, nodeList, channelList):
     if (tx_enum >= nodes) | (ch_enum > len(channelList)):
         sys.stderr.write(
             'Error in txRxForLinkNum: linknum or ch too high for nodes, channels values')
+        ch = 0
+        tx = 0
+        rx = 0
     else:
         ch = channelList[ch_enum]
         tx = nodeList[tx_enum]
@@ -126,6 +129,7 @@ def serialFileName():
             serial_filename = usb_file_list[0]
         else:
             sys.stderr.write('Error: No Listen node plugged in?\n')
+            serial_filename = '0'
     #
     return serial_filename
 
